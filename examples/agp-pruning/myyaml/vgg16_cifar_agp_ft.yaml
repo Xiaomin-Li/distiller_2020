@@ -77,6 +77,13 @@ lr_schedulers:
     step_size: 50
     gamma: 0.10
 
+extensions:
+  net_thinner:
+      class: 'FilterRemover'
+      thinning_func_str: remove_filters
+      arch: 'vgg16_cifar'
+      dataset: 'cifar10'
+
 policies:
   - pruner:
       instance_name : low_pruner_1
