@@ -34,7 +34,7 @@ from distiller.modules import Mean, EltwiseAdd
 import logging
 msglogger = logging.getLogger()
 
-SUPPORTED_DATASETS = ('imagenet', 'cifar10', 'mnist')
+SUPPORTED_DATASETS = ('imagenet', 'cifar10', 'mnist', 'cifar100', 'tiny-imagenet')
 
 # ResNet special treatment: we have our own version of ResNet, so we need to over-ride
 # TorchVision's version.
@@ -127,7 +127,11 @@ def create_model(pretrained, dataset, arch, parallel=True, device_ids=None):
     try:
         if dataset == 'imagenet':
             model, cadene = _create_imagenet_model(arch, pretrained)
+        elif dataset == 'tiny-imagenet':
+            model, cadene = _create_imagenet_model(arch, pretrained)
         elif dataset == 'cifar10':
+            model = _create_cifar10_model(arch, pretrained)
+        elif dataset == 'cifar100':
             model = _create_cifar10_model(arch, pretrained)
         elif dataset == 'mnist':
             model = _create_mnist_model(arch, pretrained)

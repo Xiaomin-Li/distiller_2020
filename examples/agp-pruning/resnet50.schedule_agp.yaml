@@ -88,13 +88,13 @@ pruners:
   fc_pruner:
     class: AutomatedGradualPruner
     initial_sparsity : 0.05
-    final_sparsity: 0.80
+    final_sparsity: 0.50
     weights: module.fc.weight
 
   conv_pruner:
     class: AutomatedGradualPruner
     initial_sparsity : 0.05
-    final_sparsity: 0.80
+    final_sparsity: 0.50
     weights: [
     #module.conv1.weight,
     module.layer1.0.conv1.weight,

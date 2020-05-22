@@ -42,6 +42,7 @@ from distiller.utils import float_range_argparse_checker as float_range
 # Logger handle
 msglogger = logging.getLogger()
 
+custom_datasets = ['cifar100', 'tiny-imagenet']
 
 class ClassifierCompressor(object):
     """Base class for applications that want to compress image classifiers.
@@ -90,7 +91,7 @@ class ClassifierCompressor(object):
     @staticmethod
     def _infer_implicit_args(args):
         # Infer the dataset from the model name
-        if not hasattr(args, 'dataset'):
+        if not hasattr(args, 'dataset') or args.dataset is None:
             args.dataset = distiller.apputils.classification_dataset_str_from_arch(args.arch)
         if not hasattr(args, "num_classes"):
             args.num_classes = distiller.apputils.classification_num_classes(args.dataset)
@@ -211,6 +212,7 @@ def init_classifier_compression_arg_parser(include_ptq_lapq_args=False):
 
     parser = argparse.ArgumentParser(description='Distiller image classification model compression')
     parser.add_argument('data', metavar='DATASET_DIR', help='path to dataset')
+    parser.add_argument('--dataset', help='available dataset, cifar10, cifar100, mnist, tiny-imagenet, imagenet')
     parser.add_argument('--arch', '-a', metavar='ARCH', default='resnet18', type=lambda s: s.lower(),
                         choices=models.ALL_MODEL_NAMES,
                         help='model architecture: ' +
@@ -383,6 +385,9 @@ def _init_learner(args):
     model = create_model(args.pretrained, args.dataset, args.arch,
                          parallel=not args.load_serialized, device_ids=args.gpus)
     compression_scheduler = None
+
+    if args.dataset in custom_datasets:
+        model.module.fc = nn.Linear(model.module.fc.in_features, args.num_classes)
 
     # TODO(barrh): args.deprecated_resume is deprecated since v0.3.1
     if args.deprecated_resume:

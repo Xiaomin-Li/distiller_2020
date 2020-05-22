@@ -29,7 +29,7 @@ import numpy as np
 import distiller
 
 
-DATASETS_NAMES = ['imagenet', 'cifar10', 'mnist']
+DATASETS_NAMES = ['imagenet', 'cifar10', 'mnist', 'cifar100', 'tiny-imagenet']
 
 
 def classification_dataset_str_from_arch(arch):
@@ -37,6 +37,10 @@ def classification_dataset_str_from_arch(arch):
         dataset = 'cifar10' 
     elif 'mnist' in arch:
         dataset = 'mnist' 
+    elif 'cifar100' in arch:
+        dataset = 'cifar100'
+    elif 'tiny-imagenet' in arch:
+        dataset = 'tiny-imagenet'
     else:
         dataset = 'imagenet'
     return dataset
@@ -45,6 +49,8 @@ def classification_dataset_str_from_arch(arch):
 def classification_num_classes(dataset):
     return {'cifar10': 10,
             'mnist': 10,
+            'cifar100':100,
+            'tiny-imagenet':200,
             'imagenet': 1000}.get(dataset, None)
 
 
@@ -55,6 +61,10 @@ def classification_get_input_shape(dataset):
         return 1, 3, 32, 32
     elif dataset == 'mnist':
         return 1, 1, 28, 28
+    elif dataset == 'cifar100':
+        return 1, 3, 32, 32
+    elif dataset == 'tiny-imagenet':
+        return 1, 3, 64, 64
     else:
         raise ValueError("dataset %s is not supported" % dataset)
 
@@ -62,6 +72,8 @@ def classification_get_input_shape(dataset):
 def __dataset_factory(dataset, arch):
     return {'cifar10': cifar10_get_datasets,
             'mnist': mnist_get_datasets,
+            'cifar100': cifar100_get_datasets,
+            'tiny-imagenet':tiny_imagenet_get_datasets,
             'imagenet': partial(imagenet_get_datasets, arch=arch)}.get(dataset, None)
 
 
@@ -208,6 +220,71 @@ def imagenet_get_datasets(data_dir, arch, load_train=True, load_test=True):
         test_dataset = datasets.ImageFolder(test_dir, test_transform)
 
     return train_dataset, test_dataset
+
+
+def cifar100_get_datasets(data_dir, load_train=True, load_test=True):
+    train_dataset = None
+    if load_train:
+        train_transform = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+
+        train_dataset = datasets.CIFAR100(root=data_dir, train=True,
+                                         download=True, transform=train_transform)
+
+    test_dataset = None
+    if load_test:
+        test_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+
+        test_dataset = datasets.CIFAR100(root=data_dir, train=False,
+                                        download=True, transform=test_transform)
+
+    return train_dataset, test_dataset
+
+def tiny_imagenet_get_datasets(data_dir, load_train=True, load_test=True):
+    """
+    Load the Tiny-ImageNet dataset.
+    """
+    train_dir = os.path.join(data_dir, 'train')
+    val_dir = os.path.join(data_dir, 'val')
+    test_dir = os.path.join(data_dir, 'tset/images')
+
+    train_dataset = None
+    if load_train:
+        train_transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(0.5),
+            transforms.ToTensor(),
+            transforms.Normalize([0.4802, 0.4481, 0.3975], [0.2302, 0.2265, 0.2262]),
+        ])
+
+        train_dataset = datasets.ImageFolder(train_dir, train_transform)
+
+    # val_dataset = None
+    # if load_val:
+    #     val_transform = transforms.Compose([
+    #         transforms.ToTensor(),
+    #         transforms.Normalize([0.4802, 0.4481, 0.3975], [0.2302, 0.2265, 0.2262]),
+    #     ])
+
+        #val_dataset = datasets.ImageFolder(val_dir, val_transform)
+    
+    test_dataset = None
+    if load_test:
+        test_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.4802, 0.4481, 0.3975], [0.2302, 0.2265, 0.2262]),
+        ])
+
+        test_dataset = datasets.ImageFolder(test_dir, test_transform)
+
+    return train_dataset, test_dataset
+
 
 def __image_size(dataset):
     # un-squeeze is used here to add the batch dimension (value=1), which is missing

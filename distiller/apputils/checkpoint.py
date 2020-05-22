@@ -59,8 +59,14 @@ def save_checkpoint(epoch, arch, model, optimizer=None, scheduler=None,
     filename = 'checkpoint.pth.tar' if name is None else name + '_checkpoint.pth.tar'
     fullpath = os.path.join(dir, filename)
     msglogger.info("Saving checkpoint to: %s" % fullpath)
+
     filename_best = 'best.pth.tar' if name is None else name + '_best.pth.tar'
     fullpath_best = os.path.join(dir, filename_best)
+    msglogger.info("Saving best checkpoint to: %s" % fullpath_best)
+
+    modelname = 'model.pth.tar' if name is None else name + '_model.pth.tar'
+    modelpath = os.path.join(dir, modelname)
+    msglogger.info("Saving model to: %s" % modelpath)
 
     checkpoint = {'epoch': epoch, 'state_dict': model.state_dict(), 'arch': arch}
     try:
@@ -83,6 +89,7 @@ def save_checkpoint(epoch, arch, model, optimizer=None, scheduler=None,
 
     checkpoint['extras'] = extras
     torch.save(checkpoint, fullpath)
+    torch.save(model, modelpath)
     if is_best:
         shutil.copyfile(fullpath, fullpath_best)
 

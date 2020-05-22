@@ -62,11 +62,12 @@ import parser
 import os
 import numpy as np
 from ptq_lapq import image_classifier_ptq_lapq
-
+import torch.nn as nn
 
 # Logger handle
 msglogger = logging.getLogger()
 
+custom_datasets = ['cifar100', 'tiny-imagenet']
 
 def main():
     # Parse arguments
@@ -81,6 +82,14 @@ def main():
 
     
 def handle_subapps(model, criterion, optimizer, compression_scheduler, pylogger, args):
+    # if args.dataset in custom_datasets:
+    #     model.module.fc = nn.Linear(model.module.fc.in_features, args.num_classes)
+    #     if args.resumed_checkpoint_path:
+    #         model, _, _, _ = apputils.load_checkpoint(model, args.resumed_checkpoint_path, model_device = args.device)
+            
+    #     model = model.module
+    #     model = nn.DataParallel(model, device_ids=args.gpus)
+
     def load_test_data(args):
         test_loader = classifier.load_data(args, load_train=False, load_val=False, load_test=True)
         return test_loader
