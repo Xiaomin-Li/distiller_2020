@@ -29,7 +29,7 @@ import numpy as np
 import distiller
 
 
-DATASETS_NAMES = ['imagenet', 'cifar10', 'mnist', 'cifar100', 'tiny-imagenet']
+DATASETS_NAMES = ['imagenet', 'cifar10', 'mnist', 'cifar100', 'tiny-imagenet', 'food101']
 
 
 def classification_dataset_str_from_arch(arch):
@@ -41,6 +41,8 @@ def classification_dataset_str_from_arch(arch):
         dataset = 'cifar100'
     elif 'tiny-imagenet' in arch:
         dataset = 'tiny-imagenet'
+    elif 'food101' in arch:
+        dataset = 'food101'
     else:
         dataset = 'imagenet'
     return dataset
@@ -51,6 +53,7 @@ def classification_num_classes(dataset):
             'mnist': 10,
             'cifar100':100,
             'tiny-imagenet':200,
+            'food101': 101,
             'imagenet': 1000}.get(dataset, None)
 
 
@@ -63,6 +66,8 @@ def classification_get_input_shape(dataset):
         return 1, 1, 28, 28
     elif dataset == 'cifar100':
         return 1, 3, 32, 32
+    elif dataset == 'food101':
+        return 1, 3, 384, 384
     elif dataset == 'tiny-imagenet':
         return 1, 3, 64, 64
     else:
@@ -74,6 +79,7 @@ def __dataset_factory(dataset, arch):
             'mnist': mnist_get_datasets,
             'cifar100': cifar100_get_datasets,
             'tiny-imagenet':tiny_imagenet_get_datasets,
+            'food101' : food101_get_datasets,
             'imagenet': partial(imagenet_get_datasets, arch=arch)}.get(dataset, None)
 
 
@@ -247,7 +253,7 @@ def cifar100_get_datasets(data_dir, load_train=True, load_test=True):
 
     return train_dataset, test_dataset
 
-def tiny_imagenet_get_datasets(data_dir, load_train=True, load_test=True):
+def tiny_imagenet_get_datasets(data_dir, arch, load_train=True, load_test=True):
     """
     Load the Tiny-ImageNet dataset.
     """
@@ -279,6 +285,42 @@ def tiny_imagenet_get_datasets(data_dir, load_train=True, load_test=True):
         test_transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([0.4802, 0.4481, 0.3975], [0.2302, 0.2265, 0.2262]),
+        ])
+
+        test_dataset = datasets.ImageFolder(test_dir, test_transform)
+
+    return train_dataset, test_dataset
+
+
+
+def food101_get_datasets(data_dir, load_train=True, load_test=True):
+    """
+    Load the Food101 dataset.
+    """
+    resize, crop = 256, 224
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+    train_dir = os.path.join(data_dir, 'train')
+    test_dir = os.path.join(data_dir, 'test')
+
+    train_dataset = None
+    if load_train:
+        train_transform = transforms.Compose([
+            transforms.RandomResizedCrop(crop),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            normalize,
+        ])
+
+        train_dataset = datasets.ImageFolder(train_dir, train_transform)
+
+    test_dataset = None
+    if load_test:
+        test_transform = transforms.Compose([
+            transforms.Resize(resize),
+            transforms.CenterCrop(crop),
+            transforms.ToTensor(),
+            normalize,
         ])
 
         test_dataset = datasets.ImageFolder(test_dir, test_transform)
