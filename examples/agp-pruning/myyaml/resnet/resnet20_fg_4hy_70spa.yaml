@@ -1,4 +1,4 @@
-# time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/resnet20_fg_4hy_70spa.yaml --resume-from=./logs/[resent20_cifar path] --reset-optimizer --vs=0 -n resnet20_fg_4hy_70spa
+# time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/resnet20_fg_4hy_70spa.yaml --resume-from=./logs/[resent20_cifar path] --reset-optimizer --vs=0 -n resnet20_fg_4hy_75spa
 
 version: 1
 
@@ -7,7 +7,7 @@ pruners:
   fine_pruner:
     class:  AutomatedGradualPruner
     initial_sparsity : 0.05
-    final_sparsity: 0.70
+    final_sparsity: 0.75
     weights: [
                 module.layer1.0.conv1.weight,
                 #module.layer1.0.conv2.weight,
