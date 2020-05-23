@@ -212,7 +212,7 @@ def init_classifier_compression_arg_parser(include_ptq_lapq_args=False):
 
     parser = argparse.ArgumentParser(description='Distiller image classification model compression')
     parser.add_argument('data', metavar='DATASET_DIR', help='path to dataset')
-    parser.add_argument('--dataset', '-d', metavar='DATASET', help='available dataset, cifar10, cifar100, food101, mnist, tiny-imagenet, imagenet')
+    parser.add_argument('--dataset', '-d', metavar='DATASET',history help='available dataset, cifar10, cifar100, food101, mnist, tiny-imagenet, imagenet')
     parser.add_argument('--arch', '-a', metavar='ARCH', default='resnet18', type=lambda s: s.lower(),
                         choices=models.ALL_MODEL_NAMES,
                         help='model architecture: ' +
