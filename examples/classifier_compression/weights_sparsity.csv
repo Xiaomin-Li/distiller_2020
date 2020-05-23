@@ -43,7 +43,7 @@ module.layer3.5.conv1.weight,"(256, 1024, 1, 1)",262144,262144,0.0
 module.layer3.5.conv2.weight,"(256, 256, 3, 3)",589824,589824,0.0
 module.layer3.5.conv3.weight,"(1024, 256, 1, 1)",262144,262144,0.0
 module.layer4.0.conv1.weight,"(512, 1024, 1, 1)",524288,524288,0.0
-module.layer4.0.conv2.weight,"(512, 512, 3, 3)",2359296,2359296,0.0
+module.layer4.0.conv2.weight,"(512, 512, 3, 3)",2359296,2359294,8.477105034598864e-05
 module.layer4.0.conv3.weight,"(2048, 512, 1, 1)",1048576,1048576,0.0
 module.layer4.0.downsample.0.weight,"(2048, 1024, 1, 1)",2097152,2097152,0.0
 module.layer4.1.conv1.weight,"(512, 2048, 1, 1)",1048576,1048576,0.0
