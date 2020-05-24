@@ -1,0 +1,156 @@
+# This is a Filter pruning schedule composed of several pruning techniques, all using AGP scheduling:
+# 1. Filter pruning (and thinning) to reduce compute and activation sizes of some layers.
+# 2. Row pruning for the last linear (fully-connected) layer.
+#
+# Baseline results:
+#     Top1: 91.780    Top5: 99.710    Loss: 0.376
+#     Total MACs: 40,813,184
+#     # of parameters: 270,896
+#
+# Results:
+#     Top1: 90.89
+#     Total MACs: 24,723,776 (=1.65x MACs)
+#     Total sparsity: 39.66
+#     # of parameters: 78,776  (=29.1% of the baseline parameters)
+#
+# time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet20_agp_ft_noslim.yaml --resume-from=./logs/[resnet20_cifar path] --reset-optimizer --vs=0 --gpu=2
+#
+# Parameters:
+# +----+-------------------------------------+----------------+---------------+----------------+------------+------------+----------+----------+----------+------------+---------+----------+------------+
+# |    | Name                                | Shape          |   NNZ (dense) |   NNZ (sparse) |   Cols (%) |   Rows (%) |   Ch (%) |   2D (%) |   3D (%) |   Fine (%) |     Std |     Mean |   Abs-Mean |
+# |----+-------------------------------------+----------------+---------------+----------------+------------+------------+----------+----------+----------+------------+---------+----------+------------|
+# |  0 | module.conv1.weight                 | (16, 3, 3, 3)  |           432 |            432 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.46913 | -0.00391 |    0.33001 |
+# |  1 | module.layer1.0.conv1.weight        | (4, 16, 3, 3)  |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.28770 | -0.03241 |    0.21274 |
+# |  2 | module.layer1.0.conv2.weight        | (16, 4, 3, 3)  |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.29264 | -0.00249 |    0.22103 |
+# |  3 | module.layer1.1.conv1.weight        | (4, 16, 3, 3)  |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.29520 | -0.02798 |    0.21003 |
+# |  4 | module.layer1.1.conv2.weight        | (16, 4, 3, 3)  |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.28653 |  0.01843 |    0.20802 |
+# |  5 | module.layer1.2.conv1.weight        | (4, 16, 3, 3)  |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.30613 | -0.01833 |    0.22049 |
+# |  6 | module.layer1.2.conv2.weight        | (16, 4, 3, 3)  |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.26298 |  0.00168 |    0.19418 |
+# |  7 | module.layer2.0.conv1.weight        | (8, 16, 3, 3)  |          1152 |           1152 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.25821 | -0.02664 |    0.19630 |
+# |  8 | module.layer2.0.conv2.weight        | (8, 8, 3, 3)   |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.33229 | -0.00770 |    0.24193 |
+# |  9 | module.layer2.0.downsample.0.weight | (8, 16, 1, 1)  |           128 |            128 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.50447 |  0.01827 |    0.38356 |
+# | 10 | module.layer2.1.conv1.weight        | (8, 8, 3, 3)   |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.22708 | -0.01493 |    0.16783 |
+# | 11 | module.layer2.1.conv2.weight        | (8, 8, 3, 3)   |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.16918 | -0.00649 |    0.13118 |
+# | 12 | module.layer2.2.conv1.weight        | (8, 8, 3, 3)   |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.26277 | -0.00515 |    0.20505 |
+# | 13 | module.layer2.2.conv2.weight        | (8, 8, 3, 3)   |           576 |            576 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.18278 |  0.00579 |    0.14240 |
+# | 14 | module.layer3.0.conv1.weight        | (64, 8, 3, 3)  |          4608 |           4608 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.21110 | -0.00988 |    0.16592 |
+# | 15 | module.layer3.0.conv2.weight        | (16, 64, 3, 3) |          9216 |           9216 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.17555 | -0.01054 |    0.13779 |
+# | 16 | module.layer3.0.downsample.0.weight | (16, 8, 1, 1)  |           128 |            128 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |    0.00000 | 0.30534 | -0.04511 |    0.23998 |
+# | 17 | module.layer3.1.conv1.weight        | (64, 16, 3, 3) |          9216 |           2304 |    0.00000 |    0.00000 |  0.00000 | 12.01172 |  0.00000 |   75.00000 | 0.14627 | -0.00116 |    0.06485 |
+# | 18 | module.layer3.1.conv2.weight        | (16, 64, 3, 3) |          9216 |           2304 |    0.00000 |    0.00000 |  0.00000 | 13.57422 |  0.00000 |   75.00000 | 0.11987 | -0.00778 |    0.05204 |
+# | 19 | module.layer3.2.conv1.weight        | (64, 16, 3, 3) |          9216 |           2304 |    0.00000 |    0.00000 |  0.00000 | 22.16797 |  7.81250 |   75.00000 | 0.10820 | -0.00347 |    0.04498 |
+# | 20 | module.layer3.2.conv2.weight        | (16, 64, 3, 3) |          9216 |           2304 |    0.00000 |    0.00000 |  9.37500 | 35.25391 |  0.00000 |   75.00000 | 0.08231 |  0.00222 |    0.02961 |
+# | 21 | module.fc.weight                    | (10, 16)       |           160 |             40 |    0.00000 |   75.00000 |  0.00000 |  0.00000 |  0.00000 |   75.00000 | 0.95659 |  0.00000 |    0.41586 |
+# | 22 | Total sparsity:                     | -              |         59024 |          31256 |    0.00000 |    0.00000 |  0.00000 |  0.00000 |  0.00000 |   47.04527 | 0.00000 |  0.00000 |    0.00000 |
+# +----+-------------------------------------+----------------+---------------+----------------+------------+------------+----------+----------+----------+------------+---------+----------+------------+
+# 2020-05-15 20:17:20,434 - Total sparsity: 47.05
+
+# 2020-05-15 20:17:20,434 - --- validate (epoch=179)-----------
+# 2020-05-15 20:17:20,434 - 10000 samples (256 per mini-batch)
+# 2020-05-15 20:17:21,148 - ==> Top1: 85.000    Top5: 98.890    Loss: 0.479
+
+# 2020-05-15 20:17:21,154 - ==> Best [Top1: 85.190   Top5: 98.910   Sparsity:47.05   NNZ-Params: 31256 on epoch: 122]
+# 2020-05-15 20:17:21,154 - Saving checkpoint to: logs/resnet20_cifar_ft_70___2020.05.15-200148/resnet20_cifar_ft_70_checkpoint.pth.tar
+# 2020-05-15 20:17:21,166 - --- test ---------------------
+# 2020-05-15 20:17:21,167 - 10000 samples (256 per mini-batch)
+# 2020-05-15 20:17:21,869 - ==> Top1: 85.000    Top5: 98.890    Loss: 0.473
+
+
+
+version: 1
+
+pruners:
+
+  low_pruner_1:
+    class: L2RankedStructureParameterPruner_AGP
+    initial_sparsity : 0.10
+    final_sparsity: 0.50
+    group_type: Filters
+    weights: [module.layer1.0.conv1.weight,
+              module.layer1.1.conv1.weight,
+              module.layer1.2.conv1.weight]
+
+  low_pruner_2:
+    class: L2RankedStructureParameterPruner_AGP
+    initial_sparsity : 0.10
+    final_sparsity: 0.50
+    group_type: Filters
+    weights: [module.layer2.0.conv1.weight, module.layer2.0.conv2.weight,
+              module.layer2.0.downsample.0.weight,
+              module.layer2.1.conv2.weight, module.layer2.2.conv2.weight,
+              module.layer2.1.conv1.weight, module.layer2.2.conv1.weight]
+
+  low_pruner_3:
+    class: L2RankedStructureParameterPruner_AGP
+    initial_sparsity : 0.10
+    final_sparsity: 0.50
+    group_type: Filters
+    group_dependency: Leader
+    weights: [module.layer3.0.conv2.weight, module.layer3.0.downsample.0.weight,
+              module.layer3.1.conv2.weight,  module.layer3.2.conv2.weight]
+
+
+  fc_pruner:
+    class: L2RankedStructureParameterPruner_AGP
+    initial_sparsity : 0.05
+    final_sparsity: 0.50
+    group_type: Rows
+    weights: [module.fc.weight]
+
+
+lr_schedulers:
+  pruning_lr:
+    class: StepLR
+    step_size: 50
+    gamma: 0.10
+
+extensions:
+  net_thinner:
+      class: 'FilterRemover'
+      thinning_func_str: remove_filters
+      arch: 'resnet20_cifar'
+      dataset: 'cifar10'
+
+
+policies:
+  - pruner:
+      instance_name : low_pruner_1
+    starting_epoch: 0
+    ending_epoch: 30
+    frequency: 2
+
+  - pruner:
+      instance_name : low_pruner_2
+    starting_epoch: 0
+    ending_epoch: 30
+    frequency: 2
+
+  - pruner:
+      instance_name : low_pruner_3
+    starting_epoch: 0
+    ending_epoch: 30
+    frequency: 2
+
+  - pruner:
+      instance_name : fc_pruner
+    starting_epoch: 30
+    ending_epoch: 50
+    frequency: 2
+
+  # Currently the thinner is disabled until the the structure pruner is done, because it interacts
+  # with the sparsity goals of the L1RankedStructureParameterPruner_AGP.
+  # This can be fixed rather easily.
+  # - extension:
+  #     instance_name: net_thinner
+  #   starting_epoch: 0
+  #   ending_epoch: 20
+  #   frequency: 2
+
+# After completing the pruning, we perform network thinning and continue fine-tuning.
+
+  - lr_scheduler:
+      instance_name: pruning_lr
+    starting_epoch: 0
+    ending_epoch: 400
+    frequency: 1
+

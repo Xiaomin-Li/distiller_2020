@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#amr
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_amr.yaml --resume-from=./logs/resnet20_cifar10_dense___2020.05.23-162643/resnet20_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_amr_50spa_fromdense --gpus 0 &
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_amr.yaml --resume-from=./logs/resnet20_fg_4hy_50spa___2020.05.23-172923/resnet20_fg_4hy_50spa_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_amr_50spa_fromfg --gpus 0 &
+
+#aopz
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_Apoz.yaml --resume-from=./logs/resnet20_cifar10_dense___2020.05.23-162643/resnet20_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_aopz_50spa_fromdense --gpus 1 &
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_Apoz.yaml --resume-from=./logs/resnet20_fg_4hy_50spa___2020.05.23-172923/resnet20_fg_4hy_50spa_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_aopz_50spa_fromfg --gpus 1 &
+
+#bf
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_Bf.yaml --resume-from=./logs/resnet20_cifar10_dense___2020.05.23-162643/resnet20_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_bf_50spa_fromdense --gpus 2 &
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_Bf.yaml --resume-from=./logs/resnet20_fg_4hy_50spa___2020.05.23-172923/resnet20_fg_4hy_50spa_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_bf_50spa_fromfg --gpus 2 &
+
+#grf
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_grf.yaml --resume-from=./logs/resnet20_cifar10_dense___2020.05.23-162643/resnet20_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_grf_50spa_fromdense --gpus 3 &
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_grf.yaml --resume-from=./logs/resnet20_fg_4hy_50spa___2020.05.23-172923/resnet20_fg_4hy_50spa_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_grf_50spa_fromfg --gpus 3 &
+
+
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_L2.yaml --resume-from=./logs/resnet20_cifar10_dense___2020.05.23-162643/resnet20_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_L2_50spa_fromdense --gpus 0 &
+time python3 compress_classifier.py --arch resnet20_cifar  ../../../data.cifar10 -p=50 --lr=0.3 --epochs=180 --compress=../agp-pruning/myyaml/resnet/diff_ft/resnet20_ft_noslim_50spa_L2.yaml --resume-from=./logs/resnet20_fg_4hy_50spa___2020.05.23-172923/resnet20_fg_4hy_50spa_best.pth.tar --reset-optimizer --vs=0 -n resnet20_ft_L2_50spa_fromfg --gpus 1 &
