@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#fg_4hy_30%
+time python3 compress_classifier.py --arch vgg16_cifar  ../../../datasets/data.cifar10 -p=50 --lr=0.01 --epochs=180 --compress=../agp-pruning/myyaml/vgg16/vgg16_fg_4hy_30spa.yaml --resume-from=./logs/vgg16_cifar10_dense___2020.05.25-114025/vgg16_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n vgg16_cifar10_fg_4hy_30spa --gpus 0 &
+
+#fg_4hy_50%
+time python3 compress_classifier.py --arch vgg16_cifar  ../../../datasets/data.cifar10 -p=50 --lr=0.01 --epochs=180 --compress=../agp-pruning/myyaml/vgg16/vgg16_fg_4hy_50spa.yaml --resume-from=./logs/vgg16_cifar10_dense___2020.05.25-114025/vgg16_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n vgg16_cifar10_fg_4hy_50spa --gpus 1 &
+
+#fg_4hy_70%
+time python3 compress_classifier.py --arch vgg16_cifar  ../../../datasets/data.cifar10 -p=50 --lr=0.01 --epochs=180 --compress=../agp-pruning/myyaml/vgg16/vgg16_fg_4hy_75spa.yaml --resume-from=./logs/vgg16_cifar10_dense___2020.05.25-114025/vgg16_cifar10_dense_best.pth.tar --reset-optimizer --vs=0 -n vgg16_cifar10_fg_4hy_75spa --gpus 2 &
