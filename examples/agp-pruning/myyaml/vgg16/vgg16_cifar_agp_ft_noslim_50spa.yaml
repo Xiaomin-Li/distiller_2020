@@ -66,7 +66,7 @@ pruners:
   fc_pruner:
     class: L1RankedStructureParameterPruner_AGP
     initial_sparsity : 0.05
-    final_sparsity: 0.5
+    final_sparsity: 0.50
     group_type: Rows
     weights: [classifier.weight]
 
@@ -93,13 +93,9 @@ policies:
 
   - pruner:
       instance_name : fc_pruner
-    starting_epoch: 30
+    starting_epoch: 32
     ending_epoch: 50
     frequency: 2
-
-  - extension:
-      instance_name: net_thinner
-    epochs: [32]
 
   - lr_scheduler:
       instance_name: pruning_lr
