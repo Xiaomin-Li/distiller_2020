@@ -43,6 +43,9 @@ from distiller.utils import float_range_argparse_checker as float_range
 msglogger = logging.getLogger()
 
 custom_datasets = ['cifar100', 'tiny-imagenet', 'food101']
+Resnet_set = ['resnet20_cifar', 'resnet32_cifar', 'resnet44_cifar', 'resnet56_cifar', ]
+Vgg_set = ['VGGCifar', 'vgg11_cifar', 'vgg11_bn_cifar', 'vgg13_cifar', 'vgg13_bn_cifar', 'vgg16_cifar', 'vgg16_bn_cifar',
+             'vgg19_bn_cifar', 'vgg19_cifar',]
 
 class ClassifierCompressor(object):
     """Base class for applications that want to compress image classifiers.
@@ -387,7 +390,10 @@ def _init_learner(args):
     compression_scheduler = None
 
     if args.dataset in custom_datasets:
-        model.module.fc = nn.Linear(model.module.fc.in_features, args.num_classes)
+        if args.arch in Resnet_set:
+            model.module.fc = nn.Linear(model.module.fc.in_features, args.num_classes)
+        elif args.arch in Vgg_set:
+            model.classifier = nn.Linear(model.classifier.in_features, args.num_classes)
 
     # TODO(barrh): args.deprecated_resume is deprecated since v0.3.1
     if args.deprecated_resume:
