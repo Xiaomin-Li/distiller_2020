@@ -66,7 +66,7 @@ pruners:
   fc_pruner:
     class: L1RankedStructureParameterPruner_AGP
     initial_sparsity : 0.05
-    final_sparsity: 75
+    final_sparsity: 0.75
     group_type: Rows
     weights: [classifier.weight]
 
